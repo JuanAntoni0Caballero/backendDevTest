@@ -1,33 +1,56 @@
-# Backend dev technical test
-We want to offer a new feature to our customers showing similar products to the one they are currently seeing. To do this we agreed with our front-end applications to create a new REST API operation that will provide them the product detail of the similar products for a given one. [Here](./similarProducts.yaml) is the contract we agreed.
+# Proyecto Backend: API de Productos
 
-We already have an endpoint that provides the product Ids similar for a given one. We also have another endpoint that returns the product detail by product Id. [Here](./existingApis.yaml) is the documentation of the existing APIs.
+Este proyecto es una API REST que permite obtener información sobre productos y productos similares mediante solicitudes HTTP.
 
-**Create a Spring boot application that exposes the agreed REST API on port 5000.**
+## Configuración inicial
 
-![Diagram](./assets/diagram.jpg "Diagram")
+Antes de ejecutar la aplicación, asegúrate de tener configurado el entorno de desarrollo correctamente.
 
-Note that _Test_ and _Mocks_ components are given, you must only implement _yourApp_.
 
-## Testing and Self-evaluation
-You can run the same test we will put through your application. You just need to have docker installed.
+## Scripts disponibles
 
-First of all, you may need to enable file sharing for the `shared` folder on your docker dashboard -> settings -> resources -> file sharing.
+En el directorio del proyecto, puedes ejecutar los siguientes comandos:
 
-Then you can start the mocks and other needed infrastructure with the following command.
-```
-docker-compose up -d simulado influxdb grafana
-```
-Check that mocks are working with a sample request to [http://localhost:3001/product/1/similarids](http://localhost:3001/product/1/similarids).
+### `mvn spring-boot:run`
 
-To execute the test run:
-```
-docker-compose run --rm k6 run scripts/test.js
-```
-Browse [http://localhost:3000/d/Le2Ku9NMk/k6-performance-test](http://localhost:3000/d/Le2Ku9NMk/k6-performance-test) to view the results.
+Este comando ejecuta la aplicación en modo de desarrollo, lo que te permitirá hacer peticiones a la API en `http://localhost:5000`.
 
-## Evaluation
-The following topics will be considered:
-- Code clarity and maintainability
-- Performance
-- Resilience
+#### Realiza peticiones a la API, GET http://localhost:8080/product/{productId}/similar
+
+#### Respuestas de la API
+
+1. 200 OK: Respuesta exitosa con los productos similares.
+2. 404 Not Found: Si el producto solicitado no existe o no tiene productos similares.
+3. 500 Internal Server Error: Si ocurre un error en el servicio. (productId 5)
+
+
+### `mvn clean install`
+
+Este comando limpia el proyecto y lo compila, generando el artefacto JAR para producción.
+
+
+## Tecnologías utilizadas
+
+- **Spring Boot**: Framework utilizado para desarrollar la API RESTful.
+- **RestTemplate**: Utilizado para realizar las solicitudes HTTP al servicio externo que proporciona la información de los productos.
+
+## Arquitectura y Patrones de Diseño
+
+### Arquitectura General
+
+La aplicación sigue una arquitectura basada en servicios, siguiendo los principios de diseño SOLID para garantizar que el código sea limpio, modular y fácil de mantener. La aplicación se organiza en las siguientes capas:
+
+#### Capa de Presentación (Controller)
+- Gestiona las solicitudes HTTP y coordina la interacción con la capa de servicios.
+- Recibe las peticiones y responde con los resultados obtenidos de la capa de lógica de negocio.
+
+#### Capa de Lógica de Negocio (Client)
+- Contiene la lógica para obtener información de productos y sus productos similares.
+- Realiza las interacciones necesarias con el cliente HTTP (`ProductClient`) para obtener los datos de productos desde un servicio externo.
+
+
+### Manejo de Errores
+
+La aplicación maneja errores de forma centralizada a través de excepciones personalizadas y un controlador global (`GlobalExceptionHandler`).
+
+- **ErrorDetails**: Estructura de datos utilizada para representar los errores y devolver respuestas detalladas en caso de fallos.
