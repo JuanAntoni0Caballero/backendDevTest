@@ -1,7 +1,10 @@
 package com.app.controller;
 
 import com.app.client.ProductClient;
+import com.app.exceptions.ErrorDetails;
 import com.app.model.Product;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +21,19 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}/similar")
-    public List<Product> getSimilarProducts(@PathVariable String productId) {
+    public ResponseEntity<?> getSimilarProducts(@PathVariable String productId) {
         List<String> similarIds = productClient.getSimilarProductIds(productId);
-        return similarIds.stream()
+
+        if (similarIds.isEmpty()) {
+            ErrorDetails errorDetails = new ErrorDetails("Product not found");
+            return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        }
+
+        List<Product> similarProducts = similarIds.stream()
                 .map(productClient::getProductById)
                 .filter(p -> p != null)
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(similarProducts);
     }
 }
