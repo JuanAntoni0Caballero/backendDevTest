@@ -22,6 +22,7 @@ public class ProductClient {
     public List<String> getSimilarProductIds(String productId) {
         try {
             String[] ids = restTemplate.getForObject(baseUrl + productId + "/similarids", String[].class);
+
             return Arrays.asList(ids);
         } catch (HttpClientErrorException.NotFound e) {
             return Collections.emptyList();
