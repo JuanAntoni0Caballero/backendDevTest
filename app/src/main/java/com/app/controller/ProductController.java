@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 
 public class ProductController {
 
-    @GetMapping("/{productId}")
+    @GetMapping("/{productId}/similar")
     public String getProduct(@PathVariable String productId) {
         return "Product details for product ID: " + productId;
     }
